@@ -11,7 +11,8 @@
             [javax.crypto KeyGenerator]
             [sun.misc BASE64Encoder]
             [sun.misc BASE64Decoder])
-   (:use [me.raynes.fs.compression]))
+   (:use [clojure.java.io]
+         [me.raynes.fs.compression :only [zip]]))
 
 ;获取hash序列
 (defn md5-result
