@@ -1,29 +1,29 @@
-(ns gpg.core
-   (:import [java.security MessageDigest]
-            [java.security Key]
-            [java.security KeyPairGenerator]
-            [java.security KeyFactory]
-            [java.security SecureRandom]
-            [java.security.spec PKCS8EncodedKeySpec]
-            [java.security.spec X509EncodedKeySpec]
-            [java.util Arrays]
-            [javax.crypto Cipher]
-            [javax.crypto KeyGenerator]
-            [sun.misc BASE64Encoder]
-            [sun.misc BASE64Decoder])
-   (:use [clojure.java.io]
-         [me.raynes.fs.compression :only [zip]]))
+(ns sample-pgp.core
+  (:import [java.security MessageDigest]
+           [java.security Key]
+           [java.security KeyPairGenerator]
+           [java.security KeyFactory]
+           [java.security SecureRandom]
+           [java.security.spec PKCS8EncodedKeySpec]
+           [java.security.spec X509EncodedKeySpec]
+           [java.util Arrays]
+           [javax.crypto Cipher]
+           [javax.crypto KeyGenerator]
+           [sun.misc BASE64Encoder]
+           [sun.misc BASE64Decoder])
+  (:use [clojure.java.io]
+        [me.raynes.fs.compression :only [zip]]))
 
 ;获取hash序列
 (defn md5-result
   "获取hash序列,参数为file类型,返回hash的byte数组"
   [file]
   (let [md5 (MessageDigest/getInstance "MD5")]
-      (.update md5 (.getBytes (slurp file) "utf-8"))
-      (.digest md5)))
+    (.update md5 (.getBytes (slurp file) "utf-8"))
+    (.digest md5)))
 
 ;BASE64编码
-(defn BASE64-encoder 
+(defn BASE64-encoder
   "参数是要编码的byte数组,返回String"
   [file-byte]
   (.encodeBuffer (BASE64Encoder.) file-byte))
@@ -41,7 +41,7 @@
   (copy (BASE64-encoder (md5-result f-mail)) f-hash))
 
 
-(defn zip-2-files 
+(defn zip-2-files
   "压缩两个文件,第一个参数是输出zip-file,后两个参数是要压缩的file"
   [out-file in-1 in-2]
   (zip (.getPath out-file) [[(.getName in-1) (slurp in-1)] [(.getName in-2) (slurp in-2)]]))
@@ -103,37 +103,37 @@
   "加密byte数组,第一个参数是算法名字符表示,第二个参数是key,第三个参数是要加密的byte数组"
   [algorithm  some-key some-byte]
   (let [cipher (Cipher/getInstance algorithm)]
-     (.init cipher Cipher/ENCRYPT_MODE some-key)
-     (.doFinal cipher some-byte)))
+    (.init cipher Cipher/ENCRYPT_MODE some-key)
+    (.doFinal cipher some-byte)))
 
 (defn decrypt
   "解密byte数组,第一个参数是算法名字符表示,第二个参数是key,第三个参数是要解密的byte数组"
   [algorithm  some-key some-byte]
   (let [cipher (Cipher/getInstance algorithm)]
-     (.init cipher Cipher/DECRYPT_MODE some-key)
-     (.doFinal cipher some-byte)))
+    (.init cipher Cipher/DECRYPT_MODE some-key)
+    (.doFinal cipher some-byte)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn DES-encrypt
   "加密byte数组,第一个参数是key,第二个参数是要加密的byte数组"
-   [some-key some-byte]
-   (encrypt "DESede" some-key some-byte))
+  [some-key some-byte]
+  (encrypt "DESede" some-key some-byte))
 
 (defn DES-decrypt
-   "解密byte数组,第一个参数是key,第二个参数是要解密的byte数组"
-   [some-key some-byte]
-   (decrypt "DESede" some-key some-byte))
+  "解密byte数组,第一个参数是key,第二个参数是要解密的byte数组"
+  [some-key some-byte]
+  (decrypt "DESede" some-key some-byte))
 
 
 (defn RSA-encrypt
-   "加密byte数组,第一个参数是key,第二个参数是要加密的byte数组"
-   [some-key some-byte]
-   (encrypt "RSA" some-key some-byte))
+  "加密byte数组,第一个参数是key,第二个参数是要加密的byte数组"
+  [some-key some-byte]
+  (encrypt "RSA" some-key some-byte))
 
 (defn RSA-decrypt
-   "解密byte数组,第一个参数是key,第二个参数是要解密的byte数组"
-   [some-key some-byte]
-   (decrypt "RSA" some-key some-byte))
+  "解密byte数组,第一个参数是key,第二个参数是要解密的byte数组"
+  [some-key some-byte]
+  (decrypt "RSA" some-key some-byte))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -151,12 +151,12 @@
 (defn DES-decrypt-string
   "DES解密,第一个参数是key-ob,第二个参数是解密的String,返回String"
   [key-ob some-string]
-    (decrypt-string DES-decrypt key-ob some-string))
+  (decrypt-string DES-decrypt key-ob some-string))
 
 (defn DES-encrypt-string
   "DES加密,第一个参数是key-ob,第二个参数是加密的String,返回String"
   [key-ob some-string]
-    (encrypt-string DES-encrypt key-ob some-string))
+  (encrypt-string DES-encrypt key-ob some-string))
 
 
 
@@ -167,14 +167,14 @@
         第二个参数是要解密的String
         返回解密后的String"
   [key-ob some-string]
-    (decrypt-string RSA-decrypt key-ob some-string))
+  (decrypt-string RSA-decrypt key-ob some-string))
 
 (defn RSA-encrypt-string
   "第一个参数是key-ob
         第二个参数是要加密的String
         返回解密后的String"
   [key-ob some-string]
-    (encrypt-string RSA-encrypt key-ob some-string))
+  (encrypt-string RSA-encrypt key-ob some-string))
 
 
 (defn RSA-encrypt-by-private-key;这里是函数名
@@ -201,5 +201,4 @@
   "第一个参数是公钥String,第二个参数是要解密的String"
   [public-key some-string]
   (RSA-decrypt-string (get-public-key-ob public-key) some-string))
-
 

@@ -1,6 +1,6 @@
-(ns gpg.main
+(ns sample-pgp.core_test
   (:import [org.apache.commons.io FileUtils])
-  (:use [gpg.core]
+  (:use [sample-pgp.core]
         [clojure.java.io]
         [me.raynes.fs.compression]))
 
@@ -55,7 +55,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;创建新的RSA-key-pair
-;(save-key-pair (generate-RSA-key-pair) "C:/Users/BlindingDark/Desktop")
+(save-key-pair (generate-RSA-key-pair) "C:/Users/BlindingDark/Desktop")
 
 ;; 创建hash文件。base64编码再保存,file-mail为mail文件,file-hash为摘要文件
 (creat-hash-file file-mail file-hash)
@@ -111,3 +111,9 @@
   (BASE64-encoder (md5-result file-mail-rec))
   ;用对方公钥解密signed-hash
   (RSA-decrypt-by-public-key (slurp file-public) (slurp file-signed-hash-rec)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;分两个部分，获得密钥和更新评级。评级是小数，但采取别人增幅时取整。
